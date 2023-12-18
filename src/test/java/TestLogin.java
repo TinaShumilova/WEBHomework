@@ -6,6 +6,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -29,12 +30,12 @@ public class TestLogin {
 
     @BeforeEach
     void open() {
-//        ChromeOptions chromeOptions = new ChromeOptions();
-//        chromeOptions.addArguments("--headless");
-//
-//        driver = new ChromeDriver(chromeOptions);
-        driver = new ChromeDriver();
-//        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--headless");
+
+        driver = new ChromeDriver(chromeOptions);
+//        driver = new ChromeDriver();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         driver.manage().window().maximize();
     }
@@ -63,9 +64,7 @@ public class TestLogin {
                 wait.until(ExpectedConditions
                         .visibilityOfAllElementsLocatedBy(By.cssSelector(".mdc-data-table__cell")));
 
-        System.out.println(groupTable.get(0).getText());
-        System.out.println(groupName);
-        assertEquals(groupTable.get(0).getText(), groupName);
+        assertEquals(groupTable.get(1).getText(), groupName);
 
 
     }
