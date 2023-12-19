@@ -16,36 +16,38 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestLogin {
-    WebDriver driver;
-    WebDriverWait wait;
-    static String USERNAME = "Student-1";
-    static String PASSWORD = "59c5266dc9";
-    String groupName = "Group" + System.currentTimeMillis();
+    private WebDriver driver;
+    private WebDriverWait wait;
+    private static final String USERNAME = "Student-1";
+    private static final String PASSWORD = "59c5266dc9";
+
 
 
     @BeforeAll
-    static void property() {
+    public static void property() {
         System.setProperty("webdriver.chrome.driver", "src\\main\\resources\\chromedriver.exe");
     }
 
     @BeforeEach
-    void open() {
-        ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("--headless");
+    public void open() {
+        // чтобы окно не открывалось
+//        ChromeOptions chromeOptions = new ChromeOptions();
+//        chromeOptions.addArguments("--headless");
+//        driver = new ChromeDriver(chromeOptions);
 
-        driver = new ChromeDriver(chromeOptions);
-//        driver = new ChromeDriver();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        driver = new ChromeDriver();
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         driver.manage().window().maximize();
     }
 
     @Test
-    void testNewGroup(){
+    public void testNewGroup(){
         login();
         WebElement addGroupIcon = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("create-btn")));
         addGroupIcon.click();
 
+        String groupName = "Group" + System.currentTimeMillis();
         WebElement addGroupField =
                 wait.until(ExpectedConditions
                         .visibilityOfElementLocated(By.cssSelector("form#update-item input[type='text']")));
@@ -60,17 +62,16 @@ public class TestLogin {
                         .xpath("//*[@id='app']/main/div/div/div[2]/div[2]/div/div[1]/button")));
         closeButton.click();
 
-        List<WebElement> groupTable =
+        WebElement groupTable =
                 wait.until(ExpectedConditions
-                        .visibilityOfAllElementsLocatedBy(By.cssSelector(".mdc-data-table__cell")));
+                        .visibilityOfElementLocated(By.xpath("//td[text()='%s']".formatted(groupName))));
 
-        assertEquals(groupTable.get(1).getText(), groupName);
-
+        assertEquals(groupTable.getText(), groupName);
 
     }
 
     @AfterEach
-    void close() {
+    public void close() {
         driver.quit();
     }
 
@@ -93,8 +94,8 @@ public class TestLogin {
 
         WebElement helloUser =
                 wait.until(ExpectedConditions
-                        .visibilityOfElementLocated(By.xpath("//*[@id=\"app\"]/main/nav/ul/li[3]/a")));
-        assertEquals("Hello, Student-1", helloUser.getText());
+                        .visibilityOfElementLocated(By.cssSelector("nav li.mdc-menu-surface--anchor a")));
+        assertEquals("Hello, %s".formatted(USERNAME), helloUser.getText());
 
     }
 }
