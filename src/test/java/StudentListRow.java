@@ -6,38 +6,29 @@ import org.openqa.selenium.support.ui.FluentWait;
 import java.time.Duration;
 import java.util.function.Function;
 
-public class TableRow {
+public class StudentListRow {
     private final WebElement root;
 
-    public TableRow(WebElement webElement){
-        this.root = webElement;
+    public StudentListRow(WebElement root) {
+        this.root = root;
     }
 
-    public String getTitle(){
+    public String getName(){
         return root.findElement(By.xpath("./td[2]")).getText();
     }
 
-    public String getStatus(){
-        return root.findElement(By.xpath("./td[3]")).getText();
-    }
-
-    public void clickDelete(String text) {
+    public void clickDeleteStudent(String text) {
         String buttonText = String.format("./td/button[text()='%s']",text);
         root.findElement(By.xpath(buttonText)).click();
     }
 
-    public void waitRestore(String text){
+    public void waitStudentRestore(String text){
         String buttonText = String.format("./td/button[text()='%s']",text);
         waitUntil(root -> root.findElement(By.xpath(buttonText)));
     }
 
-    public void addStudents(){
-        root.findElement(By.xpath("./td[4]/button")).click();
-    }
-
-    public void waitCount(int number){
-        waitUntil(root ->
-                root.findElement(By.xpath("./td[4]//span[text()='%s']".formatted(number))));
+    public String getStatus() {
+        return root.findElement(By.xpath("./td[4]")).getText();
     }
 
     private void waitUntil(Function<WebElement, WebElement> until){
@@ -46,10 +37,5 @@ public class TableRow {
                 .pollingEvery(Duration.ofSeconds(1))
                 .ignoring(NoSuchElementException.class)
                 .until(until);
-    }
-
-    public void clickViewStudents() {
-        String buttonText = String.format("./td/button[text()='%s']","zoom_in");
-        root.findElement(By.xpath(buttonText)).click();
     }
 }

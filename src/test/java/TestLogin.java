@@ -2,15 +2,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
-
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -49,17 +45,44 @@ public class TestLogin {
 
     }
 
+    @Test
+    public void errorLogin(){
+        driver.get(baseUrl);
+        LoginPage loginPage = new LoginPage(driver, wait);
+        loginPage.errorLogin();
+        assertEquals("401",loginPage.errorCode());
+        assertEquals("Invalid credentials.",loginPage.errorText());
+    }
+    @Test
+    public void testSuccessfulAddNewStudentsInGroup(){
+        String groupName = "Group" + System.currentTimeMillis();
+        MainPage mainPage = addNewGroup(groupName);
+
+        int countOfStudents = 3;
+        mainPage.successAddNStudentsInGroup(groupName, countOfStudents);
+
+        mainPage.showStudentsInGroup(groupName);
+        assertEquals(countOfStudents, mainPage.sizeOfStudentList());
+
+        String studentName = mainPage.getStudentNameByIndex(1);
+        assertEquals("active", mainPage.getStudentStatus(studentName));
+
+        mainPage.deleteStudentRow(studentName);
+        assertEquals("block",mainPage.getStudentStatus(studentName));
+
+        mainPage.restoreStudentRow(studentName);
+        assertEquals("active", mainPage.getStudentStatus(studentName));
+    }
 
     @AfterEach
     public void close() {
         driver.quit();
     }
 
-
     private void login() {
         driver.get(baseUrl);
         LoginPage loginPage = new LoginPage(driver, wait);
-        loginPage.login(USERNAME, PASSWORD);
+        loginPage.successfulLogin(USERNAME, PASSWORD);
         loginPage.checkButtonInvisible();
 
         MainPage mainPage = new MainPage(driver, wait);

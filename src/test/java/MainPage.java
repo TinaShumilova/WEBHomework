@@ -26,6 +26,15 @@ public class MainPage {
     WebElement groupTable;
     @FindBy(css = "table[aria-label='Tutors list'] tbody tr")
     List<WebElement> listTableRows;
+    @FindBy(css = "form#generate-logins input[type='number']")
+    WebElement addStudentField;
+    @FindBy(css = "form#generate-logins button")
+    WebElement addStudentButton;
+    @FindBy(xpath = "//*[@id=\"app\"]/main/div/div/div[3]/div[2]/div/div[1]/button")
+    WebElement closeNewStudentsFormButton;
+    @FindBy(css = "table[aria-label='User list'] tbody tr")
+    List<WebElement> studentList;
+
 
     public MainPage(WebDriver driver, WebDriverWait wait){
         this.driver = driver;
@@ -75,5 +84,62 @@ public class MainPage {
     public void restoreRow(String groupName) {
         getRow(groupName).clickDelete("restore_from_trash");
         getRow(groupName).waitRestore("delete");
+    }
+
+    private void addNStudentsInGroup(String groupName, int number){
+        getRow(groupName).addStudents();
+        wait.until(ExpectedConditions.visibilityOf(addStudentField));
+        addStudentField.sendKeys(String.valueOf(number));
+
+        wait.until(ExpectedConditions.visibilityOf(addStudentButton));
+        addStudentButton.click();
+
+        wait.until(ExpectedConditions.visibilityOf(closeNewStudentsFormButton));
+        closeNewStudentsFormButton.click();
+    }
+
+    public void successAddNStudentsInGroup(String groupName, int number){
+        addNStudentsInGroup(groupName, number);
+        getRow(groupName).waitCount(number);
+    }
+
+    public void showStudentsInGroup(String groupName) {
+        getRow(groupName).clickViewStudents();
+    }
+
+    private List<WebElement> findStudentList(){
+        return wait.until(ExpectedConditions.visibilityOfAllElements(studentList));
+    }
+
+    public int sizeOfStudentList(){
+        return findStudentList().size();
+    }
+
+    public StudentListRow getStudentRow(String name) {
+        return studentList.stream()
+                .map(x -> new StudentListRow(x))
+                .filter(x -> x.getName().equals(name))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    public String getStudentNameByIndex(int index) {
+        return studentList.stream()
+                .map(x -> new StudentListRow(x))
+                .toList().get(index).getName();
+    }
+
+    public void deleteStudentRow(String name) {
+        getStudentRow(name).clickDeleteStudent("delete");
+        getStudentRow(name).waitStudentRestore("restore_from_trash");
+    }
+
+    public void restoreStudentRow(String name) {
+        getStudentRow(name).clickDeleteStudent("restore_from_trash");
+        getStudentRow(name).waitStudentRestore("delete");
+    }
+
+    public String getStudentStatus(String name){
+        return getStudentRow(name).getStatus();
     }
 }
