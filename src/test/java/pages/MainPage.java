@@ -1,8 +1,11 @@
+package pages;
 
 import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
+import pages.tables.StudentListRow;
+import pages.tables.TableRow;
 
 import static com.codeborne.selenide.Selenide.*;
 
@@ -22,16 +25,16 @@ public class MainPage {
     private SelenideElement profileButton = $x("//nav//li[contains(@class,'mdc-menu-surface--anchor')]//span[text()='Profile']");
 
 
-    public String getGreeting(){
+    public String getGreeting() {
         return helloUser.should(Condition.visible).getText();
     }
 
-    public void successAddNewGroup(String groupName){
+    public void successAddNewGroup(String groupName) {
         addNewGroup(groupName);
         groupTable.should(Condition.visible).should(Condition.text(groupName));
     }
 
-    public TableRow getRow(String groupName){
+    public TableRow getRow(String groupName) {
         return listTableRows
                 .asDynamicIterable()
                 .stream()
@@ -41,7 +44,7 @@ public class MainPage {
                 .orElseThrow();
     }
 
-    public String getStatusRow(String groupName){
+    public String getStatusRow(String groupName) {
         return getRow(groupName).getStatus();
     }
 
@@ -55,7 +58,7 @@ public class MainPage {
         getRow(groupName).waitRestore("delete");
     }
 
-    public void successAddNStudentsInGroup(String groupName, int number){
+    public void successAddNStudentsInGroup(String groupName, int number) {
         addNStudentsInGroup(groupName, number);
         getRow(groupName).waitCount(number);
     }
@@ -64,7 +67,7 @@ public class MainPage {
         getRow(groupName).clickViewStudents();
     }
 
-    public int sizeOfStudentList(){
+    public int sizeOfStudentList() {
         return findStudentList().size();
     }
 
@@ -96,14 +99,13 @@ public class MainPage {
         getStudentRow(name).waitStudentRestore("delete");
     }
 
-    public String getStudentStatus(String name){
+    public String getStudentStatus(String name) {
         return getStudentRow(name).getStatus();
     }
 
-    public void clickProfileButton(){
+    public void clickProfileButton() {
         helloUser.should(Condition.visible).click();
         profileButton.should(Condition.visible).click();
-
     }
 
     private void addNewGroup(String groupName) {
@@ -111,19 +113,16 @@ public class MainPage {
         addGroupField.should(Condition.visible).setValue(groupName);
         addGroupButton.should(Condition.visible).click();
         closeButton.should(Condition.visible).click();
-
     }
 
-    private void addNStudentsInGroup(String groupName, int number){
+    private void addNStudentsInGroup(String groupName, int number) {
         getRow(groupName).addStudents();
         addStudentField.should(Condition.visible).setValue(String.valueOf(number));
-
         addStudentButton.should(Condition.visible).click();
-
         closeNewStudentsFormButton.should(Condition.visible).click();
-
     }
-    private ElementsCollection findStudentList(){
+
+    private ElementsCollection findStudentList() {
         return studentList.should(CollectionCondition.sizeGreaterThan(0));
     }
 }

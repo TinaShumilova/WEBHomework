@@ -1,36 +1,35 @@
+package tests;
+
+import pages.LoginPage;
+import pages.MainPage;
+import pages.ProfilePage;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.WebDriverRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestLogin {
-    private WebDriver driver;
-    private WebDriverWait wait;
+
     private static final String USERNAME = "Student-1";
     private static final String PASSWORD = "59c5266dc9";
     private static final String FULLNAME = "1 Student";
     MainPage mainPage = Selenide.page(MainPage.class);
+    LoginPage loginPage = Selenide.page(LoginPage.class);
+    ProfilePage profilePage = Selenide.page(ProfilePage.class);
     private static String baseUrl = "https://test-stand.gb.ru/login";
 
     @BeforeEach
     public void open() {
         Selenide.open(baseUrl);
-        driver = WebDriverRunner.getWebDriver();
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
     @Test
-    public void testNameInProfile(){
+    public void testNameInProfile() {
         login();
         mainPage.clickProfileButton();
-        ProfilePage profilePage = Selenide.page(ProfilePage.class);
         assertEquals(FULLNAME, profilePage.getAdditionalInfoName());
         assertEquals(FULLNAME, profilePage.getAvatarInfoName());
     }
@@ -47,19 +46,17 @@ public class TestLogin {
 
         mainPage.restoreRow(groupName);
         assertEquals("active", mainPage.getStatusRow(groupName));
-
     }
 
     @Test
-    public void errorLogin(){
-        driver.get(baseUrl);
-        LoginPage loginPage = new LoginPage(driver, wait);
+    public void errorLogin() {
         loginPage.errorLogin();
-        assertEquals("401",loginPage.errorCode());
-        assertEquals("Invalid credentials.",loginPage.errorText());
+        assertEquals("401", loginPage.errorCode());
+        assertEquals("Invalid credentials.", loginPage.errorText());
     }
+
     @Test
-    public void testSuccessfulAddNewStudentsInGroup(){
+    public void testSuccessfulAddNewStudentsInGroup() {
         String groupName = "Group" + System.currentTimeMillis();
         MainPage mainPage = addNewGroup(groupName);
 
@@ -73,7 +70,7 @@ public class TestLogin {
         assertEquals("active", mainPage.getStudentStatus(studentName));
 
         mainPage.deleteStudentRow(studentName);
-        assertEquals("block",mainPage.getStudentStatus(studentName));
+        assertEquals("block", mainPage.getStudentStatus(studentName));
 
         mainPage.restoreStudentRow(studentName);
         assertEquals("active", mainPage.getStudentStatus(studentName));
@@ -85,8 +82,6 @@ public class TestLogin {
     }
 
     private void login() {
-        driver.get(baseUrl);
-        LoginPage loginPage = new LoginPage(driver, wait);
         loginPage.successfulLogin(USERNAME, PASSWORD);
         loginPage.checkButtonInvisible();
 
