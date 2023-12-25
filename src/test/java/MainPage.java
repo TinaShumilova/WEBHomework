@@ -1,71 +1,40 @@
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import com.codeborne.selenide.CollectionCondition;
+import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
 
-import java.util.List;
+import static com.codeborne.selenide.Selenide.*;
 
 public class MainPage {
-    private WebDriver driver;
-    private final WebDriverWait wait;
 
-    @FindBy(css = "nav li.mdc-menu-surface--anchor a")
-    WebElement helloUser;
-    @FindBy(css ="button#create-btn")
-    WebElement addGroupIcon;
-    @FindBy(css = "form#update-item input[type='text']")
-    WebElement addGroupField;
-    @FindBy(css = "form#update-item button")
-    WebElement addGroupButton;
-    @FindBy(xpath = "//*[@id='app']/main/div/div/div[2]/div[2]/div/div[1]/button")
-    WebElement closeButton;
-    @FindBy(css = "div.mdc-data-table")
-    WebElement groupTable;
-    @FindBy(css = "table[aria-label='Tutors list'] tbody tr")
-    List<WebElement> listTableRows;
-    @FindBy(css = "form#generate-logins input[type='number']")
-    WebElement addStudentField;
-    @FindBy(css = "form#generate-logins button")
-    WebElement addStudentButton;
-    @FindBy(xpath = "//*[@id=\"app\"]/main/div/div/div[3]/div[2]/div/div[1]/button")
-    WebElement closeNewStudentsFormButton;
-    @FindBy(css = "table[aria-label='User list'] tbody tr")
-    List<WebElement> studentList;
+    private SelenideElement helloUser = $("nav li.mdc-menu-surface--anchor a");
+    private SelenideElement addGroupIcon = $("button#create-btn");
+    private SelenideElement addGroupField = $("form#update-item input[type='text']");
+    private SelenideElement addGroupButton = $("form#update-item button");
+    private SelenideElement closeButton = $x("//*[@id='app']/main/div/div/div[2]/div[2]/div/div[1]/button");
+    private SelenideElement groupTable = $("div.mdc-data-table");
+    private ElementsCollection listTableRows = $$("table[aria-label='Tutors list'] tbody tr");
+    private SelenideElement addStudentField = $("form#generate-logins input[type='number']");
+    private SelenideElement addStudentButton = $("form#generate-logins button");
+    private SelenideElement closeNewStudentsFormButton = $x("//*[@id=\"app\"]/main/div/div/div[3]/div[2]/div/div[1]/button");
+    private ElementsCollection studentList = $$("table[aria-label='User list'] tbody tr");
+    private SelenideElement profileButton = $x("//nav//li[contains(@class,'mdc-menu-surface--anchor')]//span[text()='Profile']");
 
-
-    public MainPage(WebDriver driver, WebDriverWait wait){
-        this.driver = driver;
-        this.wait = wait;
-        PageFactory.initElements(driver,this);
-    }
 
     public String getGreeting(){
-        return wait.until(ExpectedConditions.visibilityOf(helloUser)).getText();
-    }
-    private void addNewGroup(String groupName) {
-        wait.until(ExpectedConditions.visibilityOf(addGroupIcon));
-        addGroupIcon.click();
-
-        wait.until(ExpectedConditions.visibilityOf(addGroupField));
-        addGroupField.sendKeys(groupName);
-
-        wait.until(ExpectedConditions.visibilityOf(addGroupButton));
-        addGroupButton.click();
-
-        wait.until(ExpectedConditions.visibilityOf(closeButton));
-        closeButton.click();
+        return helloUser.should(Condition.visible).getText();
     }
 
     public void successAddNewGroup(String groupName){
         addNewGroup(groupName);
-        wait.until(ExpectedConditions.textToBePresentInElement(groupTable, groupName));
+        groupTable.should(Condition.visible).should(Condition.text(groupName));
     }
 
     public TableRow getRow(String groupName){
-        return listTableRows.stream()
+        return listTableRows
+                .asDynamicIterable()
+                .stream()
                 .map(x -> new TableRow(x))
                 .filter(x -> x.getTitle().equals(groupName))
                 .findFirst()
@@ -86,18 +55,6 @@ public class MainPage {
         getRow(groupName).waitRestore("delete");
     }
 
-    private void addNStudentsInGroup(String groupName, int number){
-        getRow(groupName).addStudents();
-        wait.until(ExpectedConditions.visibilityOf(addStudentField));
-        addStudentField.sendKeys(String.valueOf(number));
-
-        wait.until(ExpectedConditions.visibilityOf(addStudentButton));
-        addStudentButton.click();
-
-        wait.until(ExpectedConditions.visibilityOf(closeNewStudentsFormButton));
-        closeNewStudentsFormButton.click();
-    }
-
     public void successAddNStudentsInGroup(String groupName, int number){
         addNStudentsInGroup(groupName, number);
         getRow(groupName).waitCount(number);
@@ -107,16 +64,14 @@ public class MainPage {
         getRow(groupName).clickViewStudents();
     }
 
-    private List<WebElement> findStudentList(){
-        return wait.until(ExpectedConditions.visibilityOfAllElements(studentList));
-    }
-
     public int sizeOfStudentList(){
         return findStudentList().size();
     }
 
     public StudentListRow getStudentRow(String name) {
-        return studentList.stream()
+        return studentList
+                .asDynamicIterable()
+                .stream()
                 .map(x -> new StudentListRow(x))
                 .filter(x -> x.getName().equals(name))
                 .findFirst()
@@ -124,7 +79,9 @@ public class MainPage {
     }
 
     public String getStudentNameByIndex(int index) {
-        return studentList.stream()
+        return studentList
+                .asDynamicIterable()
+                .stream()
                 .map(x -> new StudentListRow(x))
                 .toList().get(index).getName();
     }
@@ -141,5 +98,32 @@ public class MainPage {
 
     public String getStudentStatus(String name){
         return getStudentRow(name).getStatus();
+    }
+
+    public void clickProfileButton(){
+        helloUser.should(Condition.visible).click();
+        profileButton.should(Condition.visible).click();
+
+    }
+
+    private void addNewGroup(String groupName) {
+        addGroupIcon.should(Condition.visible).click();
+        addGroupField.should(Condition.visible).setValue(groupName);
+        addGroupButton.should(Condition.visible).click();
+        closeButton.should(Condition.visible).click();
+
+    }
+
+    private void addNStudentsInGroup(String groupName, int number){
+        getRow(groupName).addStudents();
+        addStudentField.should(Condition.visible).setValue(String.valueOf(number));
+
+        addStudentButton.should(Condition.visible).click();
+
+        closeNewStudentsFormButton.should(Condition.visible).click();
+
+    }
+    private ElementsCollection findStudentList(){
+        return studentList.should(CollectionCondition.sizeGreaterThan(0));
     }
 }

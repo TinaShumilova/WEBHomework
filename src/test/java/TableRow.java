@@ -40,16 +40,17 @@ public class TableRow {
                 root.findElement(By.xpath("./td[4]//span[text()='%s']".formatted(number))));
     }
 
+
+    public void clickViewStudents() {
+        String buttonText = String.format("./td/button[text()='%s']","zoom_in");
+        root.findElement(By.xpath(buttonText)).click();
+    }
+
     private void waitUntil(Function<WebElement, WebElement> until){
         new FluentWait<>(root)
                 .withTimeout(Duration.ofSeconds(10))
                 .pollingEvery(Duration.ofSeconds(1))
                 .ignoring(NoSuchElementException.class)
                 .until(until);
-    }
-
-    public void clickViewStudents() {
-        String buttonText = String.format("./td/button[text()='%s']","zoom_in");
-        root.findElement(By.xpath(buttonText)).click();
     }
 }

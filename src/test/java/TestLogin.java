@@ -1,9 +1,9 @@
+import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.WebDriverRunner;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -15,19 +15,24 @@ public class TestLogin {
     private WebDriverWait wait;
     private static final String USERNAME = "Student-1";
     private static final String PASSWORD = "59c5266dc9";
-
+    private static final String FULLNAME = "1 Student";
+    MainPage mainPage = Selenide.page(MainPage.class);
     private static String baseUrl = "https://test-stand.gb.ru/login";
-
-    @BeforeAll
-    public static void property() {
-        System.setProperty("webdriver.chrome.driver", "src\\main\\resources\\chromedriver.exe");
-    }
 
     @BeforeEach
     public void open() {
-        driver = new ChromeDriver();
+        Selenide.open(baseUrl);
+        driver = WebDriverRunner.getWebDriver();
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        driver.manage().window().maximize();
+    }
+
+    @Test
+    public void testNameInProfile(){
+        login();
+        mainPage.clickProfileButton();
+        ProfilePage profilePage = Selenide.page(ProfilePage.class);
+        assertEquals(FULLNAME, profilePage.getAdditionalInfoName());
+        assertEquals(FULLNAME, profilePage.getAvatarInfoName());
     }
 
     @Test
@@ -64,7 +69,7 @@ public class TestLogin {
         mainPage.showStudentsInGroup(groupName);
         assertEquals(countOfStudents, mainPage.sizeOfStudentList());
 
-        String studentName = mainPage.getStudentNameByIndex(1);
+        String studentName = mainPage.getStudentNameByIndex(0);
         assertEquals("active", mainPage.getStudentStatus(studentName));
 
         mainPage.deleteStudentRow(studentName);
@@ -76,7 +81,7 @@ public class TestLogin {
 
     @AfterEach
     public void close() {
-        driver.quit();
+        WebDriverRunner.closeWebDriver();
     }
 
     private void login() {
@@ -85,14 +90,12 @@ public class TestLogin {
         loginPage.successfulLogin(USERNAME, PASSWORD);
         loginPage.checkButtonInvisible();
 
-        MainPage mainPage = new MainPage(driver, wait);
         String greetings = mainPage.getGreeting();
         assertEquals("Hello, %s".formatted(USERNAME), greetings);
     }
 
     private MainPage addNewGroup(String groupName) {
         login();
-        MainPage mainPage = new MainPage(driver, wait);
         mainPage.successAddNewGroup(groupName);
         return mainPage;
     }
