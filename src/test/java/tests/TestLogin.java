@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,12 +43,16 @@ public class TestLogin {
     }
 
     @Test
-    public void testChangeBirthDate(){
+    public void testChangeBirthDate() throws InterruptedException {
         login();
         mainPage.clickProfileButton();
         ProfilePage profilePage = Selenide.page(ProfilePage.class);
         profilePage.clickEditButton();
-        profilePage.changeBirthdate("11.09.1980");
+        String dateOfBirth = "09.09.2000";
+        profilePage.changeBirthdate(dateOfBirth);
+        Thread.sleep(5000);
+        assertEquals(dateOfBirth,profilePage.checkBirthDate());
+
     }
 
     @Test

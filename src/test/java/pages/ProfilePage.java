@@ -17,6 +17,8 @@ public class ProfilePage {
     private SelenideElement inputAvatarFileField = formEditAvatar.$("input[type='file']");
     private SelenideElement inputBirthDateField = formEditAvatar.$("input[type='date']");
     private SelenideElement submitButton = formEditAvatar.$("button[type='submit']");
+    private SelenideElement closeEditForm = $x("//*[@id=\"app\"]/main/div/div/div[2]/div[2]/div/div[1]/button");
+    private SelenideElement additionalInfoBirthDate = $x("//h3/following-sibling::div//div[contains(text(), 'Date of birth')]/following-sibling::div");
 
     public String getAdditionalInfoName() {
         return additionalInfoFullName.should(Condition.visible).getText();
@@ -41,6 +43,11 @@ public class ProfilePage {
     public void changeBirthdate(String date){
         inputBirthDateField.should(Condition.visible).setValue(date);
         submitButton.should(Condition.visible).click();
+        closeEditForm.should(Condition.visible).click();
+    }
+
+    public String checkBirthDate(){
+        return additionalInfoBirthDate.should(Condition.visible).getText();
     }
 
 
