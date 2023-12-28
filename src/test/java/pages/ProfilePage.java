@@ -15,6 +15,8 @@ public class ProfilePage {
     private SelenideElement editButton = $("button[title='More options']");
     private SelenideElement formEditAvatar = $("form#update-item");
     private SelenideElement inputAvatarFileField = formEditAvatar.$("input[type='file']");
+    private SelenideElement inputBirthDateField = formEditAvatar.$("input[type='date']");
+    private SelenideElement submitButton = formEditAvatar.$("button[type='submit']");
 
     public String getAdditionalInfoName() {
         return additionalInfoFullName.should(Condition.visible).getText();
@@ -34,7 +36,14 @@ public class ProfilePage {
 
     public String getAvatarValue(){
         return inputAvatarFileField.should(Condition.visible).getValue();
-
     }
+
+    public void changeBirthdate(String date){
+        inputBirthDateField.should(Condition.visible).setValue(date);
+        submitButton.should(Condition.visible).click();
+    }
+
+
+
 
 }

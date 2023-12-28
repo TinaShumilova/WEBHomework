@@ -41,7 +41,15 @@ public class TestLogin {
     @BeforeEach
     public void open() {
         Selenide.open(baseUrl);
+    }
 
+    @Test
+    public void testChangeBirthDate(){
+        login();
+        mainPage.clickProfileButton();
+        ProfilePage profilePage = Selenide.page(ProfilePage.class);
+        profilePage.clickEditButton();
+        profilePage.changeBirthdate("11.09.1980");
     }
 
     @Test
