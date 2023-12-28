@@ -6,16 +6,23 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestLogin {
-    private WebDriver driver;
+//    private WebDriver driver;
+    private RemoteWebDriver driver;
     private WebDriverWait wait;
     private static final String USERNAME = "Student-1";
     private static final String PASSWORD = "59c5266dc9";
@@ -24,23 +31,26 @@ public class TestLogin {
 
     @BeforeAll
     public static void property() {
-        System.setProperty("webdriver.chrome.driver", "src\\main\\resources\\chromedriver.exe");
+//        System.setProperty("webdriver.chrome.driver", "src\\main\\resources\\chromedriver.exe");
     }
 
     @BeforeEach
-    public void open() {
-        driver = new ChromeDriver();
+    public void open() throws MalformedURLException {
+//        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.setCapability("browserVersion", "120.0");
+        driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), options);
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         driver.manage().window().maximize();
     }
 
     @Test
-    public void testRow() {
+    public void testRow() throws InterruptedException {
         String groupName = "Group" + System.currentTimeMillis();
 
         MainPage mainPage = addNewGroup(groupName);
         assertEquals("active", mainPage.getStatusRow(groupName));
-
+        Thread.sleep(5000);
         mainPage.deleteRow(groupName);
         assertEquals("inactive", mainPage.getStatusRow(groupName));
 
