@@ -1,5 +1,7 @@
 package tests;
 
+import com.codeborne.selenide.Configuration;
+import org.junit.jupiter.api.BeforeAll;
 import pages.LoginPage;
 import pages.MainPage;
 import pages.ProfilePage;
@@ -8,6 +10,11 @@ import com.codeborne.selenide.WebDriverRunner;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,9 +28,20 @@ public class TestLogin {
     ProfilePage profilePage = Selenide.page(ProfilePage.class);
     private static String baseUrl = "https://test-stand.gb.ru/login";
 
+    @BeforeAll
+    public static void selenoid(){
+        Configuration.browser = "chrome";
+        Configuration.remote = "http://localhost:4444/wd/hub";
+        Map<String, Object> map = new HashMap<>();
+        map.put("enableVNC",true);
+        map.put("enableLog",true);
+        Configuration.browserCapabilities.setCapability("selenoid:options",map);
+    }
+
     @BeforeEach
     public void open() {
         Selenide.open(baseUrl);
+
     }
 
     @Test
@@ -74,6 +92,17 @@ public class TestLogin {
 
         mainPage.restoreStudentRow(studentName);
         assertEquals("active", mainPage.getStudentStatus(studentName));
+    }
+
+    @Test
+    public void testAddingAvatar(){
+        login();
+        mainPage.clickProfileButton();
+        ProfilePage profilePage = Selenide.page(ProfilePage.class);
+        profilePage.clickEditButton();
+        assertEquals("", profilePage.getAvatarValue());
+        profilePage.uploadNewAvatar(new File("src/test/resources/avatar.jpg"));
+        assertEquals("C:\\fakepath\\avatar.jpg", profilePage.getAvatarValue());
     }
 
     @AfterEach

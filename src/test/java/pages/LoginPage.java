@@ -20,7 +20,7 @@ public class LoginPage {
     }
 
     public void checkButtonInvisible() {
-        buttonSubmit.should(Condition.disabled);
+        buttonSubmit.should(Condition.disappear);
     }
 
     public void errorLogin() {
